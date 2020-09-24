@@ -1,6 +1,7 @@
 import pygame
 from pygame.draw import *
 from pygame.font import *
+from math import *
 
 pygame.init()
 
@@ -13,8 +14,10 @@ BLUE = (128, 179, 255)
 BROWN = (120, 68, 33)
 WHITE = (255, 255, 255)
 BEIGE = (233, 198, 175)
+LIGHT_BEIGE = (244, 235, 213)
 DARK_ORANGE = (255, 102, 3)
 RED = (255, 42, 42)
+VIOLET = (212, 42, 255)
 
 #screen
 width = 927
@@ -29,6 +32,15 @@ def eye(x, y, eye_width, eye_height):
 
 def hand(x_st, y_st, x_ed, y_ed):
     line(screen, BEIGE, [x_st, y_st], [x_ed, y_ed], 40)
+
+def hair(x_first, y_first, angle, a):
+    angle = radians(angle)
+    x_second = x_first + a*cos(angle)
+    y_second = y_first - a*sin(angle)
+    x_third = x_first + a*cos(angle+pi/3)
+    y_third = y_first - a*sin(angle+pi/3)
+    polygon(screen, VIOLET, [(x_first, y_first), (x_second, y_second), (x_third, y_third)])
+    polygon(screen, BLACK, [(x_first, y_first), (x_second, y_second), (x_third, y_third)], 1)
 
 #body
 circle(screen, DARK_ORANGE, (width//2, height), 300)
@@ -51,6 +63,31 @@ eye(width//2 + 75, height//2 - 50, 100, 90)
 #hands
 hand(width//2 - width//4, 3*height//4, 60, 20)
 hand(width//2 + width//4, 3*height//4, width - 60, 20)
+ellipse(screen, BEIGE, (50, 40, 90, 100))
+ellipse(screen, LIGHT_BEIGE, (50, 40, 90, 100), 2)
+ellipse(screen, BEIGE, (width - 50 - 90, 40, 90, 100))
+ellipse(screen, LIGHT_BEIGE, (width - 50 - 90, 40, 90, 100), 2)
+
+#shoulders
+y_st = 500
+x_st = 250
+polygon(screen, DARK_ORANGE, [(x_st, y_st), (x_st + 50, y_st + 80), (x_st - 10, y_st + 150), (x_st - 90, y_st + 120), (x_st - 90, y_st + 22)])
+polygon(screen, BLACK, [(x_st, y_st), (x_st+50, y_st+80), (x_st-10, y_st+150), (x_st-90, y_st+120), (x_st-90, y_st+22)], 1)
+x_st = width - 250
+polygon(screen, DARK_ORANGE, [(x_st, y_st), (x_st+90, y_st+22), (x_st+90, y_st+120), (x_st+10, y_st+150), (x_st-50, y_st+80)])
+polygon(screen, BLACK, [(x_st, y_st), (x_st+90, y_st+22), (x_st+90, y_st+120), (x_st+10, y_st+150), (x_st-50, y_st+80)], 1)
+
+#hair
+hair(260, 275, 60, 70)
+hair(280, 240, 45, 70)
+hair(305, 210, 29, 70)
+hair(345, 186, 14, 70)
+hair(395, 173, 5, 70)
+hair(450, 168, -2, 70)
+hair(500, 168, -15, 70)
+hair(550, 178, -30, 70)
+hair(595, 197, -45, 70)
+hair(628, 215, -58, 70)
 
 #table
 rect(screen, GREEN, (0, 0, width, 90))
