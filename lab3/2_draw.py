@@ -7,7 +7,7 @@ pygame.init()
 
 FPS = 30
 
-#colors
+# colors
 BLACK = (0, 0, 0)
 GREEN = (127, 255, 42)
 DARK_GREEN = (0, 128, 0)
@@ -22,56 +22,83 @@ VIOLET = (212, 42, 255)
 YELLOW = (255, 212, 42)
 GREY = (190, 200, 183)
 
-#screen
+# screen
 width = 1280
 height = 720
 screen = pygame.display.set_mode((width, height))
 screen.fill(WHITE)
 
+
 def eye(x, y, eye_width, eye_height, color):
+    """
+    Функция рисует глаз.
+    :param x: координата центра глаза по оси X
+    :param y: координата центра глаза по оси Y
+    :param eye_width: ширина глаза
+    :param eye_height: высота глаза
+    :param color: цвет
+    """
     ellipse(screen, color, (x - eye_width//2, y - eye_height//2, eye_width, eye_height))
     ellipse(screen, BLACK, (x - eye_width//2, y - eye_height//2, eye_width, eye_height), 1)
     ellipse(screen, BLACK, (x - 17, y - 10, 34, 24))
 
+
 def hand(x_st, y_st, x_ed, y_ed):
+    """
+    Функция рисует руку.
+    :param x_st: X начала руки
+    :param y_st: Y начала руки
+    :param x_ed: X конца руки
+    :param y_ed: Y конца руки
+    """
     line(screen, BEIGE, [x_st, y_st], [x_ed, y_ed], 30)
 
+
 def hair(x_first, y_first, angle, a, color):
+    """
+    Функция рисует 1 элемент волос.
+    :param x_first: левый нижний угол элемента по оси X
+    :param y_first: левый нижний угол элемента по оси Y
+    :param angle: угол поворота элемента
+    :param a: длина стороны элемента
+    :param color: цвет
+    """
     angle = radians(angle)
-    x_second = x_first + a*cos(angle)
-    y_second = y_first - a*sin(angle)
-    x_third = x_first + a*cos(angle+pi/3)
-    y_third = y_first - a*sin(angle+pi/3)
+    x_second = x_first + a * cos(angle)
+    y_second = y_first - a * sin(angle)
+    x_third = x_first + a * cos(angle + pi / 3)
+    y_third = y_first - a * sin(angle + pi / 3)
     polygon(screen, color, [(x_first, y_first), (x_second, y_second), (x_third, y_third)])
     polygon(screen, BLACK, [(x_first, y_first), (x_second, y_second), (x_third, y_third)], 1)
 
-#body
+
+# body
 circle(screen, DARK_GREEN, (width//4, height), 250)
 circle(screen, DARK_ORANGE, (3*width//4, height), 250)
 
-#face
+# face
 circle(screen, BEIGE, (width//4, height//2), 200)
 circle(screen, BEIGE, (3*width//4, height//2), 200)
 
-#mouth
+# mouth
 polygon(screen, RED, [(width//4, height//2 + 140), (width//4 - 110, height//2 + 85), (width//4 + 110, height//2 + 85)])
 polygon(screen, BLACK, [(width//4, height//2 + 140), (width//4 - 110, height//2 + 85), (width//4 + 110, height//2 + 85)], 1)
 polygon(screen, RED, [(3*width//4, height//2 + 140), (3*width//4 - 110, height//2 + 85), (3*width//4 + 110, height//2 + 85)])
 polygon(screen, BLACK, [(3*width//4, height//2 + 140), (3*width//4 - 110, height//2 + 85), (3*width//4 + 110, height//2 + 85)], 1)
 
-#nose
+# nose
 polygon(screen, BROWN, [(width//4, height//2 + 50), (width//4 - 30, height//2 + 20), (width//4 + 30, height//2 + 20)])
 polygon(screen, BLACK, [(width//4, height//2 + 50), (width//4 - 30, height//2 + 20), (width//4 + 30, height//2 + 20)], 1)
 polygon(screen, BROWN, [(3*width//4, height//2 + 50), (3*width//4 - 30, height//2 + 20), (3*width//4 + 30, height//2 + 20)])
 polygon(screen, BLACK, [(3*width//4, height//2 + 50), (3*width//4 - 30, height//2 + 20), (3*width//4 + 30, height//2 + 20)], 1)
 
-#eyes
+# eyes
 eye(width//4 - 75, height//2 - 50, 100, 90, GREY)
 eye(width//4 + 75, height//2 - 50, 100, 90, GREY)
 eye(3*width//4 - 75, height//2 - 50, 100, 90, BLUE)
 eye(3*width//4 + 75, height//2 - 50, 100, 90, BLUE)
 
-#hands
+# hands
 hand(120, 3*height//4, 30, 0)
 hand(width//2 - 120, 3*height//4, width//2 - 30, 0)
 ellipse(screen, BEIGE, (10, 40, 90, 100))
@@ -86,7 +113,7 @@ ellipse(screen, LIGHT_BEIGE, (width//2 + 10, 40, 90, 100), 2)
 ellipse(screen, BEIGE, (width - 10 - 90, 40, 90, 100))
 ellipse(screen, LIGHT_BEIGE, (width - 10 - 90, 40, 90, 100), 2)
 
-#shoulders
+# shoulders
 y_st = 480
 x_st = 150
 polygon(screen, DARK_GREEN, [(x_st, y_st), (x_st + 50, y_st + 80), (x_st - 10, y_st + 150), (x_st - 90, y_st + 120), (x_st - 90, y_st + 22)])
@@ -126,7 +153,7 @@ hair(1044, 178, -30, 70, VIOLET)
 hair(1080, 197, -45, 70, VIOLET)
 hair(1111, 225, -60, 70, VIOLET)
 
-#table
+# table
 rect(screen, GREEN, (0, 0, width, 90))
 rect(screen, BLACK, (0, 0, width, 90), 1)
 my_font = pygame.font.Font(None, 125)
