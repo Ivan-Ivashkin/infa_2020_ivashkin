@@ -1,6 +1,8 @@
 import pygame
 from pygame.draw import *
-from random import randint
+from random import *
+import random
+
 pygame.init()
 
 # Настройки экрана
@@ -8,6 +10,7 @@ FPS = 0.5
 screen = pygame.display.set_mode((1200, 900))
 
 # Цвета шариков
+WHITE = (255, 255, 255)
 RED = (255, 0, 0)
 BLUE = (0, 0, 255)
 YELLOW = (255, 255, 0)
@@ -15,7 +18,7 @@ GREEN = (0, 255, 0)
 MAGENTA = (255, 0, 255)
 CYAN = (0, 255, 255)
 BLACK = (0, 0, 0)
-COLORS = [RED, BLUE, YELLOW, GREEN, MAGENTA, CYAN]
+COLORS = [RED, BLUE, GREEN, MAGENTA, CYAN, YELLOW]
 
 
 def new_ball():
@@ -37,7 +40,18 @@ def new_ball():
     if num < max_ball_num:
         for i in range(max_ball_num - num):
             list.append(ball_list, (0, 0, 0))
-
+    values = ['True', 'False']
+    if random.choice(values) == 'True':
+        x = randint(100, 700)
+        y = randint(100, 500)
+        r = randint(40, 80)
+        color = COLORS[randint(0, 5)]
+        for i in range(r, 10, -20):
+            circle(screen, color, (x, y), i)
+            circle(screen, BLACK, (x, y), i, 1)
+            circle(screen, WHITE, (x, y), i - 10)
+            circle(screen, BLACK, (x, y), i - 10, 1)
+        list.append(ball_list, (x, y, r))
 
 # Начальное количество очков
 score = 0
@@ -46,7 +60,7 @@ score = 0
 def click(points):
     '''
     Функция анализирует нажатия левой кнопки мыши, подсчитывает и выводит количество набранных очков.
-    points - количество очков, набранных игроком ранее
+      points - количество очков, набранных игроком ранее
     '''
     distance1 = (event.pos[0] - ball_list[0][0])**2 + (event.pos[1] - ball_list[0][1])**2
     distance2 = (event.pos[0] - ball_list[1][0])**2 + (event.pos[1] - ball_list[1][1])**2
@@ -56,12 +70,43 @@ def click(points):
         score = points + 1
     else:
         score = points - 1
+    if len(ball_list) == 4:
+        distance_spec = (event.pos[0] - ball_list[3][0])** 2 + (event.pos[1] - ball_list[3][1])** 2
+        if distance_spec <= ball_list[3][2]**2:
+            score = points + 3
+
+
+def menu():
+    '''
+    '''
+    rect(screen, YELLOW, (150, 150, 900, 190))
+    text_color = BLACK
+    my_font = pygame.font.Font(None, 40)
+    text = my_font.render('Правила игры', 1, text_color)
+    screen.blit(text, (500, 152))
+    text = my_font.render('Чтобы начать, нажмите левую кнопку мыши', 1, text_color)
+    screen.blit(text, (318, 300))
+
+    my_font = pygame.font.Font(None, 30)
+    text = my_font.render('1. Цель игры - ловить разноцветные шарики, появляющиеся на экране.', 1, text_color)
+    screen.blit(text, (155, 180))
+    text = my_font.render('2. Нажимайте по шарикам левой кнопкой мыши, пока они не исчезли.', 1, text_color)
+    screen.blit(text, (155, 200))
+    text = my_font.render('3. Каждое попадание приносит вам по 1 очку. Каждый промах отнимает по 1 очку.', 1,
+                          text_color)
+    screen.blit(text, (155, 220))
+    text = my_font.render('4. Иногда на экране появляется особый шарик (он похож на мишень).', 1,
+                          text_color)
+    screen.blit(text, (155, 240))
+    text = my_font.render('Попадание по нему дает 3 очка.', 1,
+                          text_color)
+    screen.blit(text, (179, 260))
 
 
 def table(points):
     '''
     Функция обеспечивает вывод в левый верхний угол экрана таблички с текущим счетом игрока.
-    points - число очков, выводимое на табличку
+      points - число очков, выводимое на табличку
     '''
     rect(screen, GREEN, (0, 0, 150, 40))
     my_font = pygame.font.Font(None, 50)
@@ -73,21 +118,30 @@ def table(points):
     text = my_font.render(string, 1, text_color)
     screen.blit(text, (3, 3))
 
+menu()
 
 pygame.display.update()
 clock = pygame.time.Clock()
 finished = False
 
-while not finished:
-    clock.tick(FPS)
+flag = 'False'
+while not finished and flag == 'False':
     for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            finished = True
-        elif event.type == pygame.MOUSEBUTTONDOWN:
-            click(score)
-    new_ball()
-    table(score)
-    pygame.display.update()
-    screen.fill(BLACK)
+        if event.type == pygame.MOUSEBUTTONDOWN:
+            flag = 'True'
+            screen.fill(BLACK)
+
+while not finished and flag == 'True':
+        clock.tick(FPS)
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                finished = True
+            elif event.type == pygame.MOUSEBUTTONDOWN:
+                click(score)
+        new_ball()
+        table(score)
+        pygame.display.update()
+        screen.fill(BLACK)
+
 
 pygame.quit()
