@@ -25,33 +25,60 @@ def new_ball():
     '''
     Функция рисует новые шарики со случайными координатами центра, цветом и радиусом. Количество шариков - от 1 до 3.
       Количество шариков, появляющихся на экране в данный момент, определяется случайным образом.
+      Функция рисует также дополнительный шарик-мишень. Его наличие или отсутствие определяется случайным образом.
     '''
-    global ball_list
+    global ball_list, max_ball_num, values
     ball_list = []
+
     max_ball_num = 3
     num = randint(1, max_ball_num)
-    for i in range (num):
-        x = randint(100, 700)
-        y = randint(100, 500)
-        r = randint(30, 50)
-        color = COLORS[randint(0, 5)]
-        circle(screen, color, (x, y), r)
-        list.append(ball_list, (x, y, r))
-    if num < max_ball_num:
-        for i in range(max_ball_num - num):
-            list.append(ball_list, (0, 0, 0))
-    values = ['True', 'False']
-    if random.choice(values) == 'True':
-        x = randint(100, 700)
-        y = randint(100, 500)
-        r = randint(40, 80)
-        color = COLORS[randint(0, 5)]
-        for i in range(r, 10, -20):
-            circle(screen, color, (x, y), i)
-            circle(screen, BLACK, (x, y), i, 1)
-            circle(screen, WHITE, (x, y), i - 10)
-            circle(screen, BLACK, (x, y), i - 10, 1)
-        list.append(ball_list, (x, y, r))
+
+    values_list = ['True', 'False']
+    values = random.choice(values_list)
+
+    if values == 'True':
+        num = num + 1
+
+    x_prev = []
+    y_prev = []
+
+    i = 1
+
+    while i <= num:
+        x = randint(50, 1000)
+        y = randint(50, 850)
+
+        if i == 1:
+            list.append(x_prev, x)
+            list.append(y_prev, y)
+
+        r = randint(40, 60)
+
+        checker = 0
+        for i in range(len(x_prev)):
+            for j in range(len(y_prev)):
+                if (x - x_prev[i]) ** 2 + (y - y_prev[j]) ** 2 < 180 ** 2:
+                    checker = 1
+                    break
+
+        if checker == 0:
+            if (values == 'True') and (i == num):
+                color = COLORS[randint(0, 5)]
+                for i in range(r, 10, -20):
+                    circle(screen, color, (x, y), i)
+                    circle(screen, BLACK, (x, y), i, 1)
+                    circle(screen, WHITE, (x, y), i - 10)
+                    circle(screen, BLACK, (x, y), i - 10, 1)
+            else:
+                color = COLORS[randint(0, 5)]
+                circle(screen, color, (x, y), r)
+            list.append(x_prev, x)
+            list.append(y_prev, y)
+            list.append(ball_list, (x, y, r))
+            i = i + 1
+        else:
+            continue
+
 
 # Начальное количество очков
 score = 0
@@ -62,22 +89,25 @@ def click(points):
     Функция анализирует нажатия левой кнопки мыши, подсчитывает и выводит количество набранных очков.
       points - количество очков, набранных игроком ранее
     '''
-    distance1 = (event.pos[0] - ball_list[0][0])**2 + (event.pos[1] - ball_list[0][1])**2
-    distance2 = (event.pos[0] - ball_list[1][0])**2 + (event.pos[1] - ball_list[1][1])**2
-    distance3 = (event.pos[0] - ball_list[2][0])**2 + (event.pos[1] - ball_list[2][1])**2
-    if ( distance1 <= ball_list[0][2]**2) or ( distance2 <= ball_list[1][2] ** 2) or ( distance3 <= ball_list[2][2] ** 2):
-        global score
-        score = points + 1
+    distance_list = []
+    for i in range(len(ball_list)):
+        distance = (event.pos[0] - ball_list[i][0])**2 + (event.pos[1] - ball_list[i][1])**2
+        list.append(distance_list, distance)
+
+    j = distance_list.index(min(distance_list))
+    if distance_list[j] <= ball_list[j][2]**2:
+        if values == 'True' and j == len(ball_list) - 1:
+            global score
+            score = points + 3
+        else:
+            score = points + 1
     else:
         score = points - 1
-    if len(ball_list) == 4:
-        distance_spec = (event.pos[0] - ball_list[3][0])** 2 + (event.pos[1] - ball_list[3][1])** 2
-        if distance_spec <= ball_list[3][2]**2:
-            score = points + 3
 
 
 def menu():
     '''
+    Функция обеспечивает вывод на экран таблички с правилами игры (перед началом игрового процесса).
     '''
     rect(screen, YELLOW, (150, 150, 900, 190))
     text_color = BLACK
