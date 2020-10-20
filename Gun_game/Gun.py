@@ -14,6 +14,19 @@ screen = pygame.display.set_mode((width, height))
 
 # Цвета
 WHITE = (255, 255, 255)
+ORANGE = (0, 0, 0)
+
+# Настройки
+target_num = 2 # количество мишеней, одновременно присутствующих на экране
+max_len = 100 # максимальная длина отрезка, изображающего пушку
+
+
+def target_delete():
+    '''
+    Функция заменяет пораженные мишени новыми
+    :return:
+    '''
+    pass
 
 
 def new_target():
@@ -22,6 +35,12 @@ def new_target():
     :return:
     '''
     pass
+
+
+# Предварительная подготовка мишеней
+target_list = []
+for i in range(target_num):
+    ist.append(ball_list, list(new_ball()))
 
 
 def gun_turning():
@@ -64,14 +83,6 @@ def hit():
     pass
 
 
-def target_delete():
-    '''
-    Функция заменяет пораженные мишени новыми
-    :return:
-    '''
-    pass
-
-
 finished = False
 
 while not finished:
@@ -88,7 +99,6 @@ while not finished:
 
             moving_bullet(bullet)
             hit(bullet, target)
-
 
         pygame.display.update()
         screen.fill(WHITE)
