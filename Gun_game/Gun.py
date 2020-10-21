@@ -1,24 +1,42 @@
+import pygame
+import math
 from pygame.draw import *
 from pygame.event import *
 from random import *
-import time
-import math
 
 pygame.init()
 
 # Настройки прорисовки и экрана
 FPS = 30
-width = 800
-height = 800
+width = 1200
+height = 720
 screen = pygame.display.set_mode((width, height))
 
 # Цвета
 WHITE = (255, 255, 255)
-ORANGE = (0, 0, 0)
+BLACK = (0, 0, 0)
+RED = (255, 0, 0)
+YELLOW = (255, 255, 0)
+GREEN = (0, 255, 0)
+BLUE = (0, 0, 255)
+PURPLE = (128, 0, 128)
+MAROON = (128, 0, 0)
+target_color = [RED, YELLOW, GREEN, BLUE, PURPLE]
 
 # Настройки
 target_num = 2 # количество мишеней, одновременно присутствующих на экране
-max_len = 100 # максимальная длина отрезка, изображающего пушку
+min_gun_len = 40 # длина пушки до выстрела
+max_gun_len = 100 # максимальная длина отрезка, изображающего пушку
+left_line = 40 # величина поля в левой части экрана, в котором расположена пушка
+target_max_rad = 70 # максимальный радиус мишени
+rad_bullet = 20 # радиус пули
+target_max_angle = 2*math.pi # максимальное значение угла (применяется при расчетах движения мишени)
+target_speed = 5 # скорость перемещения мишеней
+gun_bottom = [0, height/2] # координата основания пушки
+gun_len = min_gun_len
+flag = 0
+min_power = 5 # начальная мощность пушки
+power = min_power
 
 
 def target_delete():
@@ -26,7 +44,8 @@ def target_delete():
     Функция заменяет пораженные мишени новыми
     :return:
     '''
-    pass
+    target_list[target_list.index(target_list)] = list(new_target())
+    return target_list
 
 
 def new_target():
@@ -34,40 +53,88 @@ def new_target():
     Функция создает кружок-мишень
     :return:
     '''
-    pass
+    color = choice(target_color)
+    x = randint(target_max_rad + left_line, width - target_max_rad)
+    y = randint(target_max_rad, height - target_max_rad)
+    rad = randint(30, target_max_rad)
+    circle(screen, color, (x, y), rad)
+    circle(screen, BLACK, (x, y), rad, 1)
+    angle = randint(0, int(target_max_angle))
+    return [x, y, rad, angle, color]
 
 
-# Предварительная подготовка мишеней
+def moving_target(target):
+    '''
+    Функция обеспечивает передвижение мишени
+    :return:
+    '''
+    x = target[0]
+    y = target[1]
+    rad = target[2]
+    color = target[4]
+    if x >= width - rad:
+        target[3] = math.pi / 2 + random() * math.pi
+    if y >= height - rad:
+        target[3] = random() * math.pi
+    if rad + left_line >= x:
+        target[3] = random() * math.pi - math.pi / 2
+    if rad >= y:
+        target[3] = random() * math.pi + math.pi
+    angle = target[3]
+    x += int(target_speed * math.cos(angle))
+    y -= int(target_speed * math.sin(angle))
+    target[0] = x
+    target[1] = y
+    circle(screen, color, (x, y), rad)
+    circle(screen, BLACK, (x, y), rad, 1)
+    return target
+
+
+# Предварительное создание мишеней
 target_list = []
 for i in range(target_num):
-    ist.append(ball_list, list(new_ball()))
+    list.append(target_list, list(new_target()))
+
+# Предварительное создание списка пуль
+bullet_list = []
 
 
-def gun_turning():
+def gun_drawing(gun_bottom, gun_top, color):
+    '''
+
+    :param gun_bottom:
+    :param gun_top:
+    :return:
+    '''
+    line(screen, color, gun_bottom, gun_top, 7)
+
+
+def gun_turning(cursor, gun_bottom, gun_len):
     '''
     Функция поворачивает пушку вслед за курсором мыши
     :return:
     '''
-    pass
+    dx = cursor[0] - gun_bottom[0]
+    dy = (-1)*(cursor[1] - gun_bottom[1])
+    angle = math.atan(dy/dx)
+    x = gun_len * math.cos(angle)
+    y = height/2 - gun_len * math.sin(angle)
+    return [x, y], angle
 
 
-def gun_shot():
-    '''
-    Функция подготавливает пушку к выстрелу: дуло удлиняется и меняет цвет
-    :return:
-    '''
-    pass
-
-
-def new_bullet():
+def new_bullet(gun_top):
     '''
     Функция обеспечивает возникновение шарика-снаряда
     :return:
     '''
-    pass
+    x = int(gun_top[0])
+    y = int(gun_top[1])
+    circle(screen, MAROON, (x, y), rad_bullet)
+    circle(screen, BLACK, (x, y), rad_bullet, 1)
+    return [x, y]
 
 
-def moving_bullet():
+def moving_bullet(bullet):
     '''
     Функция обеспечивает полет шарика-снаряда
     :return:
@@ -83,31 +150,43 @@ def hit():
     pass
 
 
+clock = pygame.time.Clock()
 finished = False
 
 while not finished:
-        clock.tick(FPS)
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                finished = True
-            elif event.type == pygame.MOUSEMOTION:
-                gun_turning()
-            elif event.type == pygame.MOUSEBUTTONDOWN:
-                gun_shot()
-            elif event.type == pygame.MOUSEBUTTONUP:
-                bullet = new_bullet()
-
-            moving_bullet(bullet)
-            hit(bullet, target)
-
-        pygame.display.update()
-        screen.fill(WHITE)
-
-start = False
-while not start:
-    time.sleep(1)
+    clock.tick(FPS)
     for event in pygame.event.get():
-        if event.type == pygame.MOUSEBUTTONDOWN:
-            start = True
+        if event.type == pygame.QUIT:
+            finished = True
+        elif event.type == pygame.MOUSEMOTION:
+            gun_top, angle = gun_turning(list(pygame.mouse.get_pos()), gun_bottom, gun_len)
+        elif event.type == pygame.MOUSEBUTTONDOWN:
+            flag = 1
+        elif event.type == pygame.MOUSEBUTTONUP:
+            flag = 0
+            color = RED
+            gun_len = min_gun_len
+            bullet = (*new_bullet(gun_top), angle, power)
+            list.append(bullet_list, bullet)
+
+    if flag == 1:
+        gun_top, angle = gun_turning(list(pygame.mouse.get_pos()), gun_bottom, gun_len)
+        gun_drawing(gun_bottom, gun_top, RED)
+        if gun_len < max_gun_len:
+            gun_len = gun_len + 1
+            power = power + 1
+    else:
+        gun_drawing(gun_bottom, gun_top, BLACK)
+        gun_len = min_gun_len
+        power = min_power
+
+    for bullet in bullet_list:
+        moving_bullet(bullet)
+
+    for target in target_list:
+        moving_target(target)
+
+    pygame.display.update()
+    screen.fill(WHITE)
 
 pygame.quit()
