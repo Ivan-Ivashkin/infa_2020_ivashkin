@@ -37,6 +37,7 @@ gun_len = min_gun_len
 flag = 0
 min_power = 5 # начальная мощность пушки
 power = min_power
+g = 10 # ускорение свободного падения
 
 
 def target_delete():
@@ -116,6 +117,8 @@ def gun_turning(cursor, gun_bottom, gun_len):
     '''
     dx = cursor[0] - gun_bottom[0]
     dy = (-1)*(cursor[1] - gun_bottom[1])
+    if dx == 0:
+        dx = 1
     angle = math.atan(dy/dx)
     x = gun_len * math.cos(angle)
     y = height/2 - gun_len * math.sin(angle)
@@ -139,7 +142,33 @@ def moving_bullet(bullet):
     Функция обеспечивает полет шарика-снаряда
     :return:
     '''
-    pass
+    x = bullet[0]
+    y = bullet[1]
+    vx = int(bullet[2])
+    vy = int(bullet[3])
+    rad = bullet[4]
+    color = bullet[5]
+
+    if x >= width - rad:
+        vx = int(vx * (-1) * 0.75 )
+    if y >= height - rad:
+        vy = int(vy * (-1) * 0.75)
+    if rad >= x:
+        vx = int(vx * (-1) * 0.75)
+    if rad >= y:
+        vy = int(vy * (-1) * 0.75)
+
+    x += vx
+    y -= vy
+    vy -= 1
+
+    bullet[0] = x
+    bullet[1] = y
+    bullet[2] = vx
+    bullet[3] = vy
+    circle(screen, color, (int(x), int(y)), rad)
+    circle(screen, BLACK, (int(x), int(y)), rad, 1)
+    return bullet
 
 
 def hit():
@@ -166,7 +195,7 @@ while not finished:
             flag = 0
             color = RED
             gun_len = min_gun_len
-            bullet = (*new_bullet(gun_top), angle, power)
+            bullet = [new_bullet(gun_top)[0], new_bullet(gun_top)[1], power*math.cos(angle), power*math.sin(angle), rad_bullet, MAROON]
             list.append(bullet_list, bullet)
 
     if flag == 1:
