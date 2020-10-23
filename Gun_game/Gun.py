@@ -29,7 +29,7 @@ min_gun_len = 40 # длина пушки до выстрела
 max_gun_len = 100 # максимальная длина отрезка, изображающего пушку
 left_line = 40 # величина поля в левой части экрана, в котором расположена пушка
 target_max_rad = 70 # максимальный радиус мишени
-rad_bullet = 20 # радиус пули
+rad_bullet = 15 # радиус пули
 target_max_angle = 2*math.pi # максимальное значение угла (применяется при расчетах движения мишени)
 target_speed = 5 # скорость перемещения мишеней
 gun_bottom = [0, height/2] # координата основания пушки
@@ -37,15 +37,17 @@ gun_len = min_gun_len
 flag = 0
 min_power = 5 # начальная мощность пушки
 power = min_power
+points = 0
+shots = 0
 g = 10 # ускорение свободного падения
 
 
-def target_delete():
+def target_delete(target_list, target):
     '''
     Функция заменяет пораженные мишени новыми
     :return:
     '''
-    target_list[target_list.index(target_list)] = list(new_target())
+    target_list[target_list.index(target)] = list(new_target())
     return target_list
 
 
@@ -137,6 +139,19 @@ def new_bullet(gun_top):
     return [x, y]
 
 
+def hit(bullet, target_list, rad_bullet, points):
+    '''
+    Функция проверяет, произошло ли попадание пули в мишень
+    :return:
+    '''
+    for target in target_list:
+        if (bullet[0] - target[0])**2 + (bullet[1] - target[1])**2 <= (target[2] + rad_bullet)**2:
+            target_list = target_delete(target_list, target)
+            points += 1
+    return target_list, points
+
+
+
 def moving_bullet(bullet):
     '''
     Функция обеспечивает полет шарика-снаряда
@@ -148,35 +163,68 @@ def moving_bullet(bullet):
     vy = int(bullet[3])
     rad = bullet[4]
     color = bullet[5]
+    wall_hits = bullet[6]
 
     if x >= width - rad:
-        vx = int(vx * (-1) * 0.75 )
-    if y >= height - rad:
-        vy = int(vy * (-1) * 0.75)
-    if rad >= x:
-        vx = int(vx * (-1) * 0.75)
-    if rad >= y:
-        vy = int(vy * (-1) * 0.75)
+        vx = vx * (-1) * 0.75
+        vy = vy * 0.9
+        x = width - rad - 1
+        wall_hits += 1
+    elif y >= height - rad:
+        vy = vy * (-1) * 0.75
+        vx = vx * 0.9
+        y = height - rad - 1
+        wall_hits += 1
+    elif rad >= x:
+        vx = vx * (-1) * 0.75
+        vy = vy * 0.9
+        x = rad + 1
+        wall_hits += 1
+    elif rad >= y:
+        vy = vy * (-1) * 0.75
+        vx = vx * 0.9
+        y = rad + 1
+        wall_hits += 1
 
     x += vx
     y -= vy
     vy -= 1
 
-    bullet[0] = x
-    bullet[1] = y
-    bullet[2] = vx
-    bullet[3] = vy
-    circle(screen, color, (int(x), int(y)), rad)
-    circle(screen, BLACK, (int(x), int(y)), rad, 1)
-    return bullet
+    if wall_hits >= 15:
+        bullet_list.pop(bullet_list.index(bullet))
+    else:
+        bullet[0] = x
+        bullet[1] = y
+        bullet[2] = vx
+        bullet[3] = vy
+        bullet[6] = wall_hits
+        circle(screen, color, (int(x), int(y)), rad)
+        circle(screen, BLACK, (int(x), int(y)), rad, 1)
+        return bullet
 
 
-def hit():
+def points_table(points):
     '''
-    Функция проверяет, произошло ли попадание пули в мишень
-    :return:
+    Функция обеспечивает работу счетчика очков
+    :param points: количество очков, выводимое на экран
+    :return: возвращаемых параметров нет
     '''
-    pass
+    my_font = pygame.font.Font(None, 50)
+    string = "Счёт: " + str(points)
+    text = my_font.render(string, 1, BLACK)
+    screen.blit(text, (5, 3))
+
+
+def shots_table(shots):
+    '''
+    Функция обеспечивает работу счетчика очков
+    :param points: количество очков, выводимое на экран
+    :return: возвращаемых параметров нет
+    '''
+    my_font = pygame.font.Font(None, 50)
+    string = "Выстрелов: " + str(shots)
+    text = my_font.render(string, 1, BLACK)
+    screen.blit(text, (width - 300, 3))
 
 
 clock = pygame.time.Clock()
@@ -192,10 +240,11 @@ while not finished:
         elif event.type == pygame.MOUSEBUTTONDOWN:
             flag = 1
         elif event.type == pygame.MOUSEBUTTONUP:
+            shots = shots + 1
             flag = 0
             color = RED
             gun_len = min_gun_len
-            bullet = [new_bullet(gun_top)[0], new_bullet(gun_top)[1], power*math.cos(angle), power*math.sin(angle), rad_bullet, MAROON]
+            bullet = [new_bullet(gun_top)[0], new_bullet(gun_top)[1], power*math.cos(angle), power*math.sin(angle), rad_bullet, MAROON, 0]
             list.append(bullet_list, bullet)
 
     if flag == 1:
@@ -210,10 +259,14 @@ while not finished:
         power = min_power
 
     for bullet in bullet_list:
+        target_list, points = hit(bullet, target_list, rad_bullet, points)
         moving_bullet(bullet)
 
     for target in target_list:
         moving_target(target)
+
+    points_table(points)
+    shots_table(shots)
 
     pygame.display.update()
     screen.fill(WHITE)
