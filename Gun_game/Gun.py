@@ -21,17 +21,18 @@ GREEN = (0, 255, 0)
 BLUE = (0, 0, 255)
 PURPLE = (128, 0, 128)
 MAROON = (128, 0, 0)
+GREY = (200, 200, 200)
 target_color = [RED, YELLOW, GREEN, BLUE, PURPLE]
 
 # Настройки
 target_num = 2 # количество мишеней, одновременно присутствующих на экране
 min_gun_len = 40 # длина пушки до выстрела
 max_gun_len = 100 # максимальная длина отрезка, изображающего пушку
-left_line = 40 # величина поля в левой части экрана, в котором расположена пушка
-target_max_rad = 70 # максимальный радиус мишени
+sc_line = 55 # величина поля в левой части экрана, в котором расположена пушка
+target_max_rad = 50 # максимальный радиус мишени
 rad_bullet = 15 # радиус пули
 target_max_angle = 2*math.pi # максимальное значение угла (применяется при расчетах движения мишени)
-target_speed = 5 # скорость перемещения мишеней
+target_speed = 10 # скорость перемещения мишеней
 gun_bottom = [0, height/2] # координата основания пушки
 gun_len = min_gun_len
 flag = 0
@@ -39,7 +40,7 @@ min_power = 5 # начальная мощность пушки
 power = min_power
 points = 0
 shots = 0
-g = 10 # ускорение свободного падения
+g = 1 # ускорение свободного падения
 
 
 def target_delete(target_list, target):
@@ -57,7 +58,7 @@ def new_target():
     :return:
     '''
     color = choice(target_color)
-    x = randint(target_max_rad + left_line, width - target_max_rad)
+    x = randint(target_max_rad + sc_line, width - target_max_rad)
     y = randint(target_max_rad, height - target_max_rad)
     rad = randint(30, target_max_rad)
     circle(screen, color, (x, y), rad)
@@ -77,9 +78,9 @@ def moving_target(target):
     color = target[4]
     if x >= width - rad:
         target[3] = math.pi / 2 + random() * math.pi
-    if y >= height - rad:
+    if y >= height - rad - sc_line:
         target[3] = random() * math.pi
-    if rad + left_line >= x:
+    if rad >= x:
         target[3] = random() * math.pi - math.pi / 2
     if rad >= y:
         target[3] = random() * math.pi + math.pi
@@ -152,7 +153,7 @@ def hit(bullet, target_list, rad_bullet, points):
 
 
 
-def moving_bullet(bullet):
+def moving_bullet(bullet, g):
     '''
     Функция обеспечивает полет шарика-снаряда
     :return:
@@ -188,7 +189,7 @@ def moving_bullet(bullet):
 
     x += vx
     y -= vy
-    vy -= 1
+    vy -= g
 
     if wall_hits >= 15:
         bullet_list.pop(bullet_list.index(bullet))
@@ -224,7 +225,7 @@ def shots_table(shots):
     my_font = pygame.font.Font(None, 50)
     string = "Выстрелов: " + str(shots)
     text = my_font.render(string, 1, BLACK)
-    screen.blit(text, (width - 300, 3))
+    screen.blit(text, (width - 250, 3))
 
 
 clock = pygame.time.Clock()
@@ -260,7 +261,7 @@ while not finished:
 
     for bullet in bullet_list:
         target_list, points = hit(bullet, target_list, rad_bullet, points)
-        moving_bullet(bullet)
+        moving_bullet(bullet, g)
 
     for target in target_list:
         moving_target(target)
@@ -270,5 +271,7 @@ while not finished:
 
     pygame.display.update()
     screen.fill(WHITE)
+
+    rect(screen, GREY, (0, height-sc_line, width, sc_line))
 
 pygame.quit()
