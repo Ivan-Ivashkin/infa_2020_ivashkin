@@ -105,7 +105,7 @@ bullet_list = []
 
 def gun_drawing(gun_bottom, gun_top, color):
     '''
-
+    Gun-drawing function
     :param gun_bottom:
     :param gun_top:
     :return:
