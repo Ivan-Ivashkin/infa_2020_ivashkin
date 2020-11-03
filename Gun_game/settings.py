@@ -1,10 +1,11 @@
+import math
 from colors import *
 
 FPS = 30
 width = 1200
 height = 720
 
-target_color = [RED, YELLOW, GREEN, BLUE, PURPLE]
+target_colors = [RED, YELLOW, GREEN, BLUE, PURPLE]
 
 target_num = 2 # количество мишеней, одновременно присутствующих на экране
 min_gun_len = 40 # длина пушки до выстрела

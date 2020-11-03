@@ -18,7 +18,7 @@ class Target:
         speed=settings.target_speed
     ):
         self.surface = surface
-        self.color = color or choice(target_color)
+        self.color = color or choice(settings.target_colors)
         width, height = self.surface.get_size()
         self.x = randint(max_rad + sc_line, width - max_rad)
         self.y = randint(max_rad, height - max_rad)
@@ -31,10 +31,6 @@ class Target:
         circle(screen, BLACK, (self.x, self.y), self.rad, 1)
 
     def move(self):
-    '''
-    Функция обеспечивает передвижение мишени
-    :return:
-    '''
         width, height = self.surface.get_size()
         if self.x >= width - self.rad:
             self.angle = math.pi / 2 + random() * math.pi
@@ -44,8 +40,8 @@ class Target:
             self.angle = random() * math.pi - math.pi / 2
         if self.rad >= self.y:
             self.angle = random() * math.pi + math.pi
-        x += int(self.speed * math.cos(self.angle))
-        y -= int(self.speed * math.sin(self.angle))
+        self.x += int(self.speed * math.cos(self.angle))
+        self.y -= int(self.speed * math.sin(self.angle))
 
 
 class Gun:
@@ -77,7 +73,6 @@ class Gun:
         if self.len < settings.max_gun_len:
             self.len += 1
             self.power += 1
-        self.len += 1
 
     def shoot(self):
         x = self.bottom_x + self.len * math.cos(self.angle)
@@ -101,7 +96,7 @@ class Bullet:
         self.wall_hits = 0
 
     def draw(self):
-        circle(self.surface, self.color, (int(self.x), int(self.y), self.rad)
+        circle(self.surface, self.color, (int(self.x), int(self.y)), self.rad)
         circle(self.surface, BLACK, (int(self.x), int(self.y)), self.rad, 1)
 
     def move(self):
@@ -127,8 +122,7 @@ class Bullet:
             self.vy -= g
 
     def hit_check(self, target):
-        return ((target.x - self.x) ** 2 + (target.y - self.y) ** 2) <= (target.rad + self.rad) ** 2)
-
+        return ((target.x - self.x) ** 2 + (target.y - self.y) ** 2) <= (target.rad + self.rad) ** 2
 
 
 pygame.init()
@@ -136,6 +130,14 @@ screen = pygame.display.set_mode((settings.width, settings.height))
 
 gun = Gun(screen)
 shots = 0
+bullet_list = []
+
+target_list = []
+for i in range(settings.target_num):
+    target_list.append(Target(screen))
+
+finished = False
+clock = pygame.time.Clock()
 
 while not finished:
     clock.tick(settings.FPS)
@@ -154,6 +156,14 @@ while not finished:
         gun.power_up()
 
     gun.draw()
+
+    for bullet in bullet_list:
+        bullet.draw()
+        bullet.move()
+
+    for target in target_list:
+        target.draw()
+        target.move()
 
     pygame.display.update()
     screen.fill(WHITE)
