@@ -1,13 +1,12 @@
 import pygame
 from pygame.draw import *
-from pygame.font import *
 from math import *
 
 pygame.init()
 
 FPS = 30
 
-#colors
+# colors
 BLACK = (0, 0, 0)
 GREEN = (127, 255, 42)
 DARK_GREEN = (0, 128, 0)
@@ -22,116 +21,200 @@ VIOLET = (212, 42, 255)
 YELLOW = (255, 212, 42)
 GREY = (190, 200, 183)
 
-#screen
+# screen
 width = 1280
 height = 720
 screen = pygame.display.set_mode((width, height))
 screen.fill(WHITE)
 
+
 def eye(x, y, eye_width, eye_height, color):
-    ellipse(screen, color, (x - eye_width//2, y - eye_height//2, eye_width, eye_height))
-    ellipse(screen, BLACK, (x - eye_width//2, y - eye_height//2, eye_width, eye_height), 1)
+    """
+    Функция рисует глаз.
+    :param x: координата центра глаза по оси X
+    :param y: координата центра глаза по оси Y
+    :param eye_width: ширина глаза
+    :param eye_height: высота глаза
+    :param color: цвет
+    """
+    ellipse(screen, color, (x - eye_width // 2, y - eye_height // 2, eye_width, eye_height))
+    ellipse(screen, BLACK, (x - eye_width // 2, y - eye_height // 2, eye_width, eye_height), 1)
     ellipse(screen, BLACK, (x - 17, y - 10, 34, 24))
 
+
 def hand(x_st, y_st, x_ed, y_ed):
+    """
+    Функция рисует руку.
+    :param x_st: X начала руки
+    :param y_st: Y начала руки
+    :param x_ed: X конца руки
+    :param y_ed: Y конца руки
+    """
     line(screen, BEIGE, [x_st, y_st], [x_ed, y_ed], 30)
 
+
 def hair(x_first, y_first, angle, a, color):
+    """
+    Функция рисует 1 элемент волос.
+    :param x_first: левый нижний угол элемента по оси X
+    :param y_first: левый нижний угол элемента по оси Y
+    :param angle: угол поворота элемента
+    :param a: длина стороны элемента
+    :param color: цвет
+    """
     angle = radians(angle)
-    x_second = x_first + a*cos(angle)
-    y_second = y_first - a*sin(angle)
-    x_third = x_first + a*cos(angle+pi/3)
-    y_third = y_first - a*sin(angle+pi/3)
+    x_second = x_first + a * cos(angle)
+    y_second = y_first - a * sin(angle)
+    x_third = x_first + a * cos(angle + pi / 3)
+    y_third = y_first - a * sin(angle + pi / 3)
     polygon(screen, color, [(x_first, y_first), (x_second, y_second), (x_third, y_third)])
     polygon(screen, BLACK, [(x_first, y_first), (x_second, y_second), (x_third, y_third)], 1)
 
-#body
-circle(screen, DARK_GREEN, (width//4, height), 250)
-circle(screen, DARK_ORANGE, (3*width//4, height), 250)
 
-#face
-circle(screen, BEIGE, (width//4, height//2), 200)
-circle(screen, BEIGE, (3*width//4, height//2), 200)
+def body(x, y, radius, color):
+    """
+    Функция рисует тело человека.
+    :param x: координата центра по X
+    :param y: координата центра по Y
+    :param radius: радиус тела
+    :param color: цвет
+    """
+    circle(screen, color, (x, y), radius)
 
-#mouth
-polygon(screen, RED, [(width//4, height//2 + 140), (width//4 - 110, height//2 + 85), (width//4 + 110, height//2 + 85)])
-polygon(screen, BLACK, [(width//4, height//2 + 140), (width//4 - 110, height//2 + 85), (width//4 + 110, height//2 + 85)], 1)
-polygon(screen, RED, [(3*width//4, height//2 + 140), (3*width//4 - 110, height//2 + 85), (3*width//4 + 110, height//2 + 85)])
-polygon(screen, BLACK, [(3*width//4, height//2 + 140), (3*width//4 - 110, height//2 + 85), (3*width//4 + 110, height//2 + 85)], 1)
 
-#nose
-polygon(screen, BROWN, [(width//4, height//2 + 50), (width//4 - 30, height//2 + 20), (width//4 + 30, height//2 + 20)])
-polygon(screen, BLACK, [(width//4, height//2 + 50), (width//4 - 30, height//2 + 20), (width//4 + 30, height//2 + 20)], 1)
-polygon(screen, BROWN, [(3*width//4, height//2 + 50), (3*width//4 - 30, height//2 + 20), (3*width//4 + 30, height//2 + 20)])
-polygon(screen, BLACK, [(3*width//4, height//2 + 50), (3*width//4 - 30, height//2 + 20), (3*width//4 + 30, height//2 + 20)], 1)
+def face(x, y, radius, color):
+    """
+    Функция рисует лицо.
+    :param x: координата центра по X
+    :param y: координата центра по Y
+    :param radius: радиус лица
+    :param color: цвет
+    """
+    circle(screen, color, (x, y), radius)
+    circle(screen, color, (x, y), radius)
 
-#eyes
-eye(width//4 - 75, height//2 - 50, 100, 90, GREY)
-eye(width//4 + 75, height//2 - 50, 100, 90, GREY)
-eye(3*width//4 - 75, height//2 - 50, 100, 90, BLUE)
-eye(3*width//4 + 75, height//2 - 50, 100, 90, BLUE)
 
-#hands
-hand(120, 3*height//4, 30, 0)
-hand(width//2 - 120, 3*height//4, width//2 - 30, 0)
-ellipse(screen, BEIGE, (10, 40, 90, 100))
-ellipse(screen, LIGHT_BEIGE, (10, 40, 90, 100), 2)
-ellipse(screen, BEIGE, (width//2 - 10 - 90, 40, 90, 100))
-ellipse(screen, LIGHT_BEIGE, (width//2 - 10 - 90, 40, 90, 100), 2)
+def mouth(x, y, color):
+    """
+    Функция рисует рот.
+    :param x: координата X нижнего уголка рта
+    :param y: координата Y нижнего уголка рта
+    :param color: цвет
+    """
+    polygon(screen, color, [(x, y), (x - 110, y - 55), (x + 110, y - 55)])
+    polygon(screen, BLACK, [(x, y), (x - 110, y - 55), (x + 110, y - 55)], 1)
 
-hand(width//2 + 120, 3*height//4, width//2 + 30, 0)
-hand(width - 120, 3*height//4, width - 30, 0)
-ellipse(screen, BEIGE, (width//2 + 10, 40, 90, 100))
-ellipse(screen, LIGHT_BEIGE, (width//2 + 10, 40, 90, 100), 2)
-ellipse(screen, BEIGE, (width - 10 - 90, 40, 90, 100))
-ellipse(screen, LIGHT_BEIGE, (width - 10 - 90, 40, 90, 100), 2)
 
-#shoulders
-y_st = 480
-x_st = 150
-polygon(screen, DARK_GREEN, [(x_st, y_st), (x_st + 50, y_st + 80), (x_st - 10, y_st + 150), (x_st - 90, y_st + 120), (x_st - 90, y_st + 22)])
-polygon(screen, BLACK, [(x_st, y_st), (x_st+50, y_st+80), (x_st-10, y_st+150), (x_st-90, y_st+120), (x_st-90, y_st+22)], 1)
-x_st = width//2 - 150
-polygon(screen, DARK_GREEN, [(x_st, y_st), (x_st+90, y_st+22), (x_st+90, y_st+120), (x_st+10, y_st+150), (x_st-50, y_st+80)])
-polygon(screen, BLACK, [(x_st, y_st), (x_st+90, y_st+22), (x_st+90, y_st+120), (x_st+10, y_st+150), (x_st-50, y_st+80)], 1)
+def nose(x, y, color):
+    """
+    Функция рисует рот.
+    :param x: координата X нижнего уголка рта
+    :param y: координата Y нижнего уголка рта
+    :param color: цвет
+    """
+    polygon(screen, color, [(x, y), (x - 30, y - 30), (x + 30, y - 30)])
+    polygon(screen, BLACK, [(x, y), (x - 30, y - 30), (x + 30, y - 30)], 1)
 
-y_st = 480
-x_st = width//2 + 150
-polygon(screen, DARK_ORANGE, [(x_st, y_st), (x_st + 50, y_st + 80), (x_st - 10, y_st + 150), (x_st - 90, y_st + 120), (x_st - 90, y_st + 22)])
-polygon(screen, BLACK, [(x_st, y_st), (x_st+50, y_st+80), (x_st-10, y_st+150), (x_st-90, y_st+120), (x_st-90, y_st+22)], 1)
-x_st = width - 150
-polygon(screen, DARK_ORANGE, [(x_st, y_st), (x_st+90, y_st+22), (x_st+90, y_st+120), (x_st+10, y_st+150), (x_st-50, y_st+80)])
-polygon(screen, BLACK, [(x_st, y_st), (x_st+90, y_st+22), (x_st+90, y_st+120), (x_st+10, y_st+150), (x_st-50, y_st+80)], 1)
 
-#hair
-hair(132, 285, 60, 70, YELLOW)
-hair(150, 247, 45, 70, YELLOW)
-hair(173, 217, 33, 70, YELLOW)
-hair(205, 186, 14, 70, YELLOW)
-hair(255, 173, 5, 70, YELLOW)
-hair(310, 168, -2, 70, YELLOW)
-hair(360, 168, -15, 70, YELLOW)
-hair(406, 178, -30, 70, YELLOW)
-hair(441, 197, -45, 70, YELLOW)
-hair(470, 225, -60, 70, YELLOW)
+def eyes(x, y, eye_width, eye_height, color):
+    """
+    Функция рисует пару глаз.
+    :param x: координата X центра между глаз
+    :param y: координата Y центра между глаз
+    :param eye_width: ширина глаза
+    :param eye_height: высота глаза
+    :param color: цвет
+    """
+    eye(x - 75, y, eye_width, eye_height, color)
+    eye(x + 75, y, eye_width, eye_height, color)
 
-hair(772, 285, 60, 70, VIOLET)
-hair(790, 247, 45, 70, VIOLET)
-hair(820, 217, 33, 70, VIOLET)
-hair(855, 186, 14, 70, VIOLET)
-hair(905, 173, 5, 70, VIOLET)
-hair(960, 168, -2, 70, VIOLET)
-hair(1010, 168, -15, 70, VIOLET)
-hair(1044, 178, -30, 70, VIOLET)
-hair(1080, 197, -45, 70, VIOLET)
-hair(1111, 225, -60, 70, VIOLET)
 
-#table
-rect(screen, GREEN, (0, 0, width, 90))
-rect(screen, BLACK, (0, 0, width, 90), 1)
-my_font = pygame.font.Font(None, 125)
-text = my_font.render('PYTHON is REALLY AMAZING', 1, BLACK)
-screen.blit(text, (3, 3))
+def hands(x, y):
+    """
+    Функция рисует пару рук.
+    :param x: координата X
+    :param y: координата Y
+    """
+    hand(x + 0, y, x - 80, 0)
+    hand(x + 400, y, x + 480, 0)
+    ellipse(screen, BEIGE, (x - 110, 40, 90, 100))
+    ellipse(screen, LIGHT_BEIGE, (x - 110, 40, 90, 100), 2)
+    ellipse(screen, BEIGE, (x + 425, 40, 90, 100))
+    ellipse(screen, LIGHT_BEIGE, (x + 425, 40, 90, 100), 2)
+
+
+def shoulders(x_st, y_st, color):
+    """
+    Функция рисуен плечи.
+    :param x_st: начальная координата X
+    :param y_st: начальная координата Y
+    :param color: цвет
+    """
+    x_st -= 150
+    polygon(screen, color, [(x_st, y_st), (x_st + 50, y_st + 80), (x_st - 10, y_st + 150), (x_st - 90, y_st + 120),
+                            (x_st - 90, y_st + 22)])
+    polygon(screen, BLACK, [(x_st, y_st), (x_st + 50, y_st + 80), (x_st - 10, y_st + 150), (x_st - 90, y_st + 120),
+                            (x_st - 90, y_st + 22)], 1)
+    x_st += 300
+    polygon(screen, color, [(x_st, y_st), (x_st + 90, y_st + 22), (x_st + 90, y_st + 120), (x_st + 10, y_st + 150),
+                            (x_st - 50, y_st + 80)])
+    polygon(screen, BLACK, [(x_st, y_st), (x_st + 90, y_st + 22), (x_st + 90, y_st + 120), (x_st + 10, y_st + 150),
+                            (x_st - 50, y_st + 80)], 1)
+
+
+def full_hair(x, y, a, color):
+    """
+    Функция рисует волосы человечка
+    :param x: начальная координата X
+    :param y: начальная координата Y
+    :param a: длина сегмента
+    :param color: цвет
+    """
+    x_list = [0, 18, 41, 73, 123, 178, 228, 274, 309, 338]
+    y_list = [0, 38, 68, 99, 112, 117, 117, 107, 88, 60]
+    deg_list = [60, 45, 33, 14, 5, -2, -15, -30, -45, -60]
+    for i in range(10):
+        hair(x + x_list[i], y - y_list[i], deg_list[i], a, color)
+
+
+def man(x, y, eyes_color, hair_color, body_color, mouth_color=RED, face_color=BEIGE, nose_color=BROWN):
+    """
+    Функция рисует человечка.
+    :param x: координаты центра тела по X
+    :param y: координаты центра тела по Y
+    :param eyes_color: цвет глаз
+    :param hair_color: цвет волос
+    :param body_color: цвет тела
+    :param mouth_color: цвет рта
+    :param face_color: цвет лица
+    :param nose_color: цвет носа
+    """
+    body(x, y, 250, body_color)
+    hands(x - 200, y - 200)
+    shoulders(x, y - 250, body_color)
+    face(x, y - 385, 200, face_color)
+    mouth(x, y - 250, mouth_color)
+    nose(x, y - 340, nose_color)
+    eyes(x, y - 420, 100, 90, eyes_color)
+    full_hair(x - 185, y - 450, 70, hair_color)
+
+
+def text(words, color):
+    """
+    Функция пишет текст в рамочке заданного цвета.
+    :param words: текст для вывода на экран
+    :param color: цвет рамочки
+    """
+    rect(screen, color, (0, 0, width, 90))
+    rect(screen, BLACK, (0, 0, width, 90), 1)
+    my_font = pygame.font.Font(None, 125)
+    text_temp = my_font.render(words, 1, BLACK)
+    screen.blit(text_temp, (3, 3))
+
+
+man(width // 4, height, BLUE, YELLOW, DARK_GREEN)
+man(3 * width // 4, height, GREEN, RED, BLACK)
+text('PYTHON is REALLY AMAZING', GREEN)
 
 pygame.display.update()
 clock = pygame.time.Clock()
